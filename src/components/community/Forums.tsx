@@ -6,6 +6,8 @@ import { ForumActions } from "./forum/ForumActions";
 import { ForumFilters } from "./forum/ForumFilters";
 import { ForumCategories } from "./forum/ForumCategories";
 import { TrendingUp, Crown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Forums() {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -13,9 +15,36 @@ export function Forums() {
   const [sortBy, setSortBy] = useState<"latest" | "trending" | "popular">("trending");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
 
+  const { data: categories } = useQuery({
+    queryKey: ["forumCategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("forum_categories")
+        .select(`
+          *,
+          forum_topics (
+            id,
+            title,
+            created_at,
+            user_id,
+            views,
+            emotions,
+            has_recipe,
+            forum_replies(count)
+          )
+        `);
+
+      if (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+      }
+      return data || [];
+    },
+  });
+
   return (
     <div className="space-y-6">
-      <TrendingMoods />
+      <TrendingMoods categories={categories || []} />
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <ForumSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
