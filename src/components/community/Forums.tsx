@@ -15,7 +15,7 @@ export function Forums() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"latest" | "trending" | "popular">("trending");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
-  const { data: subscriptionData } = useSubscription();
+  const { data: subscriptionData, isLoading: isSubscriptionLoading } = useSubscription();
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ["forumCategories"],
@@ -44,7 +44,7 @@ export function Forums() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading || isSubscriptionLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

@@ -19,7 +19,7 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
   const { user } = useSession();
 
   const { data: categories, isLoading } = useQuery({
-    queryKey: ["forumCategories"],
+    queryKey: ["forumCategories", filter],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("forum_categories")
@@ -45,7 +45,7 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
     },
   });
 
-  const handleNewTopic = async (categoryId: string) => {
+  const handleNewTopic = async (categoryId: string, isPremiumCategory: boolean) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -56,10 +56,10 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
       return;
     }
 
-    if (!isPremium) {
+    if (isPremiumCategory && !isPremium) {
       toast({
         title: "Premium Feature",
-        description: "Creating topics is a premium feature. Upgrade to start discussions!",
+        description: "Creating topics in premium categories requires a premium subscription",
         variant: "destructive",
       });
       navigate("/pricing");
@@ -70,6 +70,7 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
   };
 
   const filteredCategories = categories?.filter(category => {
+    // Apply search filter
     if (searchQuery) {
       const matchesSearch = 
         category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,20 +78,21 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
       if (!matchesSearch) return false;
     }
     
+    // Apply category filter
     if (selectedFilter) {
       return category.name === selectedFilter;
     }
-    
+
     // Filter based on category type and premium status
     switch (filter) {
       case "emotion":
         return category.category_type === "emotion";
       case "interest":
-        return category.category_type === "interest" && !category.is_premium;
+        return category.category_type === "interest" && (!category.is_premium || isPremium);
       case "premium":
         return category.is_premium;
       default:
-        return true;
+        return !category.is_premium || isPremium;
     }
   });
 
@@ -128,7 +130,7 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
   return (
     <CategoryList 
       categories={getSortedCategories()} 
-      onNewTopic={handleNewTopic} 
+      onNewTopic={handleNewTopic}
       filter={filter}
       sortBy={sortBy}
       isPremium={isPremium}

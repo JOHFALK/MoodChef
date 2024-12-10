@@ -25,12 +25,13 @@ interface CategoryListProps {
 }
 
 export function CategoryList({ categories, onNewTopic, filter = "all", sortBy, isPremium }: CategoryListProps) {
-  const filteredCategories = categories?.filter((category) => {
-    if (filter === "emotion") return category.category_type === "emotion";
-    if (filter === "interest") return category.category_type === "interest" && !category.is_premium;
-    if (filter === "premium") return category.is_premium;
-    return true;
-  });
+  if (!categories.length) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No categories found
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -39,9 +40,13 @@ export function CategoryList({ categories, onNewTopic, filter = "all", sortBy, i
       animate="show"
       className="grid gap-6"
     >
-      {filteredCategories?.map((category) => (
+      {categories.map((category) => (
         <motion.div key={category.id} variants={item}>
-          <CategoryCard category={category} onNewTopic={onNewTopic} isPremium={isPremium} />
+          <CategoryCard 
+            category={category} 
+            onNewTopic={() => onNewTopic(category.id, category.is_premium)} 
+            isPremium={isPremium} 
+          />
         </motion.div>
       ))}
     </motion.div>
