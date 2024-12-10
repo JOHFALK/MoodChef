@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CategoryList } from "./CategoryList";
 import { useSession } from "@/hooks/use-session";
-import { useSubscription } from "@/hooks/use-subscription";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -82,7 +81,17 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
       return category.name === selectedFilter;
     }
     
-    return true;
+    // Filter based on category type and premium status
+    switch (filter) {
+      case "emotion":
+        return category.category_type === "emotion";
+      case "interest":
+        return category.category_type === "interest" && !category.is_premium;
+      case "premium":
+        return category.is_premium;
+      default:
+        return true;
+    }
   });
 
   const getSortedCategories = () => {
