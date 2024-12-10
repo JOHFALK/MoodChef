@@ -1,7 +1,13 @@
 import { CategoryList } from "./CategoryList";
 
 interface ForumCategoriesProps {
-  categories: any[];
+  categories: Array<{
+    id: string;
+    name: string;
+    category_type: string;
+    forum_topics?: Array<any>;
+    is_premium?: boolean;
+  }>;
   filter: "all" | "emotion" | "interest" | "premium";
   sortBy: "trending" | "latest" | "popular";
   searchQuery: string;
@@ -10,7 +16,7 @@ interface ForumCategoriesProps {
 }
 
 export function ForumCategories({ 
-  categories,
+  categories = [], // Provide default empty array
   filter, 
   sortBy, 
   searchQuery, 
