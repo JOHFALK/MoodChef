@@ -94,10 +94,10 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
       default:
         return !category.is_premium || isPremium;
     }
-  });
+  }) || [];
 
   const getSortedCategories = () => {
-    if (!filteredCategories) return [];
+    if (!filteredCategories.length) return [];
     
     switch (sortBy) {
       case "trending":

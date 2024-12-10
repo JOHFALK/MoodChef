@@ -6,8 +6,6 @@ import { ForumActions } from "./forum/ForumActions";
 import { ForumFilters } from "./forum/ForumFilters";
 import { ForumCategories } from "./forum/ForumCategories";
 import { TrendingUp, Crown } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
 
 export function Forums() {
@@ -17,34 +15,7 @@ export function Forums() {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const { data: subscriptionData, isLoading: isSubscriptionLoading } = useSubscription();
 
-  const { data: categories, isLoading } = useQuery({
-    queryKey: ["forumCategories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("forum_categories")
-        .select(`
-          *,
-          forum_topics (
-            id,
-            title,
-            created_at,
-            user_id,
-            views,
-            emotions,
-            has_recipe,
-            forum_replies(count)
-          )
-        `);
-
-      if (error) {
-        console.error("Error fetching categories:", error);
-        throw error;
-      }
-      return data || [];
-    },
-  });
-
-  if (isLoading || isSubscriptionLoading) {
+  if (isSubscriptionLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -54,7 +25,7 @@ export function Forums() {
 
   return (
     <div className="space-y-6">
-      <TrendingMoods categories={categories || []} />
+      <TrendingMoods />
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <ForumSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
