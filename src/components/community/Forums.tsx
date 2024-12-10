@@ -11,6 +11,7 @@ import { ForumFilters } from "./forum/ForumFilters";
 import { TrendingMoods } from "./forum/TrendingMoods";
 import { Flame, TrendingUp, Clock, ThumbsUp, Crown } from "lucide-react";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useSession } from "@/hooks/use-session";
 
 export function Forums() {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export function Forums() {
   const [sortBy, setSortBy] = useState<"latest" | "trending" | "popular">("trending");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const { data: subscriptionData } = useSubscription();
+  const { user } = useSession();
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ["forumCategories"],
@@ -38,15 +40,27 @@ export function Forums() {
             has_recipe,
             forum_replies(count)
           )
-        `)
-        .order("created_at", { foreignTable: "forum_topics", ascending: false });
+        `);
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+      }
+      return data || [];
     },
   });
 
-  const handleNewTopic = () => {
+  const handleNewTopic = async (categoryId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to create topics",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
     if (!subscriptionData?.isSubscribed) {
       toast({
         title: "Premium Feature",
@@ -56,7 +70,8 @@ export function Forums() {
       navigate("/pricing");
       return;
     }
-    navigate("/community/new-topic");
+    
+    navigate(`/community/new-topic/${categoryId}`);
   };
 
   const filteredCategories = categories?.filter(category => {

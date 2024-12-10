@@ -60,7 +60,6 @@ export default function NewTopic() {
         description: "Topic created successfully",
       });
 
-      // Navigate to the new topic
       navigate(`/community/topic/${data.id}`);
     } catch (error) {
       console.error("Error creating topic:", error);
