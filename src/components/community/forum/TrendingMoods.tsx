@@ -3,12 +3,16 @@ import { Flame } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface TrendingMoodsProps {
-  categories: any[];
+  categories: Array<{
+    id: string;
+    name: string;
+    category_type: string;
+    forum_topics?: Array<any>;
+  }>;
 }
 
 export function TrendingMoods({ categories }: TrendingMoodsProps) {
   const getTrendingMoods = () => {
-    if (!categories) return [];
     return categories
       .filter(cat => cat.category_type === 'emotion')
       .sort((a, b) => (b.forum_topics?.length || 0) - (a.forum_topics?.length || 0))
