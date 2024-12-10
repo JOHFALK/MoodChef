@@ -52,9 +52,17 @@ export function Forums() {
     );
   }
 
+  // Only render TrendingMoods if we have categories data
+  const renderTrendingMoods = () => {
+    if (!categories || categories.length === 0) {
+      return null;
+    }
+    return <TrendingMoods categories={categories} />;
+  };
+
   return (
     <div className="space-y-6">
-      <TrendingMoods categories={categories || []} />
+      {renderTrendingMoods()}
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <ForumSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
