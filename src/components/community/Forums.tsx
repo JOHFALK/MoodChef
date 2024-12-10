@@ -13,7 +13,7 @@ import { useSubscription } from "@/hooks/use-subscription";
 export function Forums() {
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"latest" | "trending" | "popular">("trending");
+  const [sortBy, setSortBy] = useState<"trending" | "latest" | "popular">("trending");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const { data: subscriptionData, isLoading: isSubscriptionLoading } = useSubscription();
 
@@ -79,7 +79,7 @@ export function Forums() {
 
         <TabsContent value="all" className="mt-6">
           <ForumCategories 
-            categories={categories || []}
+            categories={categories}
             filter="all"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -90,7 +90,7 @@ export function Forums() {
 
         <TabsContent value="emotion" className="mt-6">
           <ForumCategories 
-            categories={categories || []}
+            categories={categories}
             filter="emotion"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -101,7 +101,7 @@ export function Forums() {
 
         <TabsContent value="interest" className="mt-6">
           <ForumCategories 
-            categories={categories || []}
+            categories={categories}
             filter="interest"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -112,7 +112,7 @@ export function Forums() {
 
         <TabsContent value="premium" className="mt-6">
           <ForumCategories 
-            categories={categories || []}
+            categories={categories}
             filter="premium"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -123,7 +123,7 @@ export function Forums() {
 
         <TabsContent value="trending" className="mt-6">
           <ForumCategories 
-            categories={categories || []}
+            categories={categories}
             filter="all"
             sortBy="trending"
             searchQuery={searchQuery}
