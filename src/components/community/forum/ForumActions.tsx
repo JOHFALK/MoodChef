@@ -1,14 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Flame, Clock, ThumbsUp, Crown } from "lucide-react";
+import { MessageSquare, Flame, Clock, ThumbsUp } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
+import { useSession } from "@/hooks/use-session";
 
 interface ForumActionsProps {
   sortBy: "trending" | "latest" | "popular";
@@ -24,6 +17,16 @@ interface ForumActionsProps {
 
 export function ForumActions({ sortBy, setSortBy }: ForumActionsProps) {
   const navigate = useNavigate();
+  const { user } = useSession();
+
+  const handleNewTopic = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    // Navigate to category selection for new topic
+    navigate("/community/categories");
+  };
 
   return (
     <motion.div 
@@ -57,39 +60,15 @@ export function ForumActions({ sortBy, setSortBy }: ForumActionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2 border-primary/20 hover:border-primary group"
-          >
-            <MessageSquare className="h-4 w-4 group-hover:text-primary transition-colors" />
-            New Topic
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Premium Feature</DialogTitle>
-            <DialogDescription className="space-y-4 pt-4">
-              <p>
-                Creating new topics is a premium feature. Upgrade your account to:
-              </p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>Create new topics in any category</li>
-                <li>Access exclusive recipe content</li>
-                <li>Get personalized mood recommendations</li>
-              </ul>
-              <Button 
-                className="w-full mt-4"
-                onClick={() => navigate("/pricing")}
-              >
-                Upgrade to Premium
-              </Button>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="gap-2 border-primary/20 hover:border-primary group"
+        onClick={handleNewTopic}
+      >
+        <MessageSquare className="h-4 w-4 group-hover:text-primary transition-colors" />
+        New Topic
+      </Button>
     </motion.div>
   );
 }

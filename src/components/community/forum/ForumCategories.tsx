@@ -1,4 +1,5 @@
 import { CategoryList } from "./CategoryList";
+import { useNavigate } from "react-router-dom";
 
 interface ForumCategoriesProps {
   categories: Array<{
@@ -18,7 +19,7 @@ interface ForumCategoriesProps {
 }
 
 export function ForumCategories({ 
-  categories = [], // Provide default empty array
+  categories = [], 
   filter, 
   sortBy, 
   searchQuery, 
@@ -26,12 +27,14 @@ export function ForumCategories({
   isPremium 
 }: ForumCategoriesProps) {
 
-  const handleNewTopic = async (categoryId: string, isPremiumCategory: boolean) => {
+  const navigate = useNavigate();
+
+  const handleNewTopic = (categoryId: string, isPremiumCategory: boolean) => {
     if (!isPremium && isPremiumCategory) {
-      // Handle premium category access
+      navigate("/pricing");
       return;
     }
-    // Navigate to new topic creation
+    navigate(`/community/new-topic/${categoryId}`);
   };
 
   const filteredCategories = categories.filter(category => {
