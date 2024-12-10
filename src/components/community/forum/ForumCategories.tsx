@@ -4,7 +4,9 @@ interface ForumCategoriesProps {
   categories: Array<{
     id: string;
     name: string;
+    description: string | null;
     category_type: string;
+    created_at: string;
     forum_topics?: Array<any>;
     is_premium?: boolean;
   }>;
