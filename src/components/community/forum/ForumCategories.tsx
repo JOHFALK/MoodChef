@@ -1,11 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { CategoryList } from "./CategoryList";
-import { useSession } from "@/hooks/use-session";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface ForumCategoriesProps {
+  categories: any[];
   filter: "all" | "emotion" | "interest" | "premium";
   sortBy: "trending" | "latest" | "popular";
   searchQuery: string;
@@ -13,63 +9,24 @@ interface ForumCategoriesProps {
   isPremium?: boolean;
 }
 
-export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, isPremium }: ForumCategoriesProps) {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { user } = useSession();
-
-  const { data: categories, isLoading } = useQuery({
-    queryKey: ["forumCategories", filter],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("forum_categories")
-        .select(`
-          *,
-          forum_topics (
-            id,
-            title,
-            created_at,
-            user_id,
-            views,
-            emotions,
-            has_recipe,
-            forum_replies(count)
-          )
-        `);
-
-      if (error) {
-        console.error("Error fetching categories:", error);
-        throw error;
-      }
-      return data || [];
-    },
-  });
+export function ForumCategories({ 
+  categories,
+  filter, 
+  sortBy, 
+  searchQuery, 
+  selectedFilter,
+  isPremium 
+}: ForumCategoriesProps) {
 
   const handleNewTopic = async (categoryId: string, isPremiumCategory: boolean) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to create topics",
-        variant: "destructive",
-      });
-      navigate("/login");
+    if (!isPremium && isPremiumCategory) {
+      // Handle premium category access
       return;
     }
-
-    if (isPremiumCategory && !isPremium) {
-      toast({
-        title: "Premium Feature",
-        description: "Creating topics in premium categories requires a premium subscription",
-        variant: "destructive",
-      });
-      navigate("/pricing");
-      return;
-    }
-    
-    navigate(`/community/new-topic/${categoryId}`);
+    // Navigate to new topic creation
   };
 
-  const filteredCategories = categories?.filter(category => {
+  const filteredCategories = categories.filter(category => {
     // Apply search filter
     if (searchQuery) {
       const matchesSearch = 
@@ -86,15 +43,15 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
     // Filter based on category type and premium status
     switch (filter) {
       case "emotion":
-        return category.category_type === "emotion";
+        return category.category_type === "emotion" && (!category.is_premium || isPremium);
       case "interest":
         return category.category_type === "interest" && (!category.is_premium || isPremium);
       case "premium":
-        return category.is_premium;
+        return category.is_premium && isPremium;
       default:
         return !category.is_premium || isPremium;
     }
-  }) || [];
+  });
 
   const getSortedCategories = () => {
     if (!filteredCategories.length) return [];
@@ -118,14 +75,6 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, i
         return filteredCategories;
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
     <CategoryList 

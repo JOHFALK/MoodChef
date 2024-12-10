@@ -6,6 +6,8 @@ import { ForumActions } from "./forum/ForumActions";
 import { ForumFilters } from "./forum/ForumFilters";
 import { ForumCategories } from "./forum/ForumCategories";
 import { TrendingUp, Crown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
 
 export function Forums() {
@@ -15,7 +17,34 @@ export function Forums() {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const { data: subscriptionData, isLoading: isSubscriptionLoading } = useSubscription();
 
-  if (isSubscriptionLoading) {
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ["forumCategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("forum_categories")
+        .select(`
+          *,
+          forum_topics (
+            id,
+            title,
+            created_at,
+            user_id,
+            views,
+            emotions,
+            has_recipe,
+            forum_replies(count)
+          )
+        `);
+
+      if (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+      }
+      return data || [];
+    },
+  });
+
+  if (isSubscriptionLoading || isCategoriesLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -25,7 +54,7 @@ export function Forums() {
 
   return (
     <div className="space-y-6">
-      <TrendingMoods />
+      <TrendingMoods categories={categories || []} />
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <ForumSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -50,6 +79,7 @@ export function Forums() {
 
         <TabsContent value="all" className="mt-6">
           <ForumCategories 
+            categories={categories || []}
             filter="all"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -60,6 +90,7 @@ export function Forums() {
 
         <TabsContent value="emotion" className="mt-6">
           <ForumCategories 
+            categories={categories || []}
             filter="emotion"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -70,6 +101,7 @@ export function Forums() {
 
         <TabsContent value="interest" className="mt-6">
           <ForumCategories 
+            categories={categories || []}
             filter="interest"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -80,6 +112,7 @@ export function Forums() {
 
         <TabsContent value="premium" className="mt-6">
           <ForumCategories 
+            categories={categories || []}
             filter="premium"
             sortBy={sortBy}
             searchQuery={searchQuery}
@@ -90,6 +123,7 @@ export function Forums() {
 
         <TabsContent value="trending" className="mt-6">
           <ForumCategories 
+            categories={categories || []}
             filter="all"
             sortBy="trending"
             searchQuery={searchQuery}

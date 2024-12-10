@@ -15,6 +15,12 @@ export function TrendingMoods({ categories }: TrendingMoodsProps) {
       .slice(0, 3);
   };
 
+  const trendingMoods = getTrendingMoods();
+
+  if (!trendingMoods.length) {
+    return null;
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -23,7 +29,7 @@ export function TrendingMoods({ categories }: TrendingMoodsProps) {
     >
       <h2 className="text-2xl font-bold mb-4">Trending Moods</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {getTrendingMoods().map((mood) => (
+        {trendingMoods.map((mood) => (
           <Card key={mood.id} className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="flex items-center gap-2">
               <Flame className="h-5 w-5 text-primary" />
