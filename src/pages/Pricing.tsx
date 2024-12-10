@@ -86,11 +86,11 @@ export default function Pricing() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-primary" />
-                  <span>Ingredient matching</span>
+                  <span>Community access</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-primary" />
-                  <span>Community voting</span>
+                  <span>Recipe voting</span>
                 </li>
               </ul>
             </CardContent>
@@ -150,7 +150,7 @@ export default function Pricing() {
                 onClick={() => handleSubscribe(YEARLY_PRICE_ID)}
                 disabled={loading}
               >
-                Subscribe Yearly ($49.99)
+                Subscribe Yearly ($45.99)
               </Button>
             </CardFooter>
           </Card>
