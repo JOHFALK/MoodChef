@@ -11,13 +11,13 @@ interface ForumCategoriesProps {
   sortBy: "trending" | "latest" | "popular";
   searchQuery: string;
   selectedFilter: string | null;
+  isPremium?: boolean;
 }
 
-export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter }: ForumCategoriesProps) {
+export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter, isPremium }: ForumCategoriesProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useSession();
-  const { data: subscriptionData } = useSubscription();
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ["forumCategories"],
@@ -57,7 +57,7 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter }:
       return;
     }
 
-    if (!subscriptionData?.isSubscribed) {
+    if (!isPremium) {
       toast({
         title: "Premium Feature",
         description: "Creating topics is a premium feature. Upgrade to start discussions!",
@@ -122,7 +122,7 @@ export function ForumCategories({ filter, sortBy, searchQuery, selectedFilter }:
       onNewTopic={handleNewTopic} 
       filter={filter}
       sortBy={sortBy}
-      isPremium={subscriptionData?.isSubscribed}
+      isPremium={isPremium}
     />
   );
 }

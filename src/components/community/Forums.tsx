@@ -8,14 +8,16 @@ import { ForumCategories } from "./forum/ForumCategories";
 import { TrendingUp, Crown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export function Forums() {
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"latest" | "trending" | "popular">("trending");
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const { data: subscriptionData } = useSubscription();
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading } = useQuery({
     queryKey: ["forumCategories"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,6 +43,14 @@ export function Forums() {
       return data || [];
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -73,6 +83,7 @@ export function Forums() {
             sortBy={sortBy}
             searchQuery={searchQuery}
             selectedFilter={selectedFilter}
+            isPremium={subscriptionData?.isSubscribed}
           />
         </TabsContent>
 
@@ -82,6 +93,7 @@ export function Forums() {
             sortBy={sortBy}
             searchQuery={searchQuery}
             selectedFilter={selectedFilter}
+            isPremium={subscriptionData?.isSubscribed}
           />
         </TabsContent>
 
@@ -91,6 +103,7 @@ export function Forums() {
             sortBy={sortBy}
             searchQuery={searchQuery}
             selectedFilter={selectedFilter}
+            isPremium={subscriptionData?.isSubscribed}
           />
         </TabsContent>
 
@@ -100,6 +113,7 @@ export function Forums() {
             sortBy={sortBy}
             searchQuery={searchQuery}
             selectedFilter={selectedFilter}
+            isPremium={subscriptionData?.isSubscribed}
           />
         </TabsContent>
 
@@ -109,6 +123,7 @@ export function Forums() {
             sortBy="trending"
             searchQuery={searchQuery}
             selectedFilter={selectedFilter}
+            isPremium={subscriptionData?.isSubscribed}
           />
         </TabsContent>
       </Tabs>
